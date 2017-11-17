@@ -1,0 +1,33 @@
+{
+  "name": "facedetector",
+  "version": "1.0.0",
+  "description": "Detect and track faces in real-time from web camera and video stream",
+  "main": "index.js",
+  "scripts": {
+    "start": "run-p watch server:nodejs",
+    "server:nodejs": "http-server ./example -p 7000 -o -c-1",
+    "watch": "run-p watch:*",
+    "build": "browserify index.js --standalone FaceDetector -o dist/FaceDetector.js",
+    "watch:example-js": "watchify index.js --standalone FaceDetector -o example/js/FaceDetector.js -v"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/riversun/facedetector.git"
+  },
+  "author": "Tom Misawa <riversun.org@gmail.com> (https://github.com/riversun)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/riversun/facedetector/issues"
+  },
+  "homepage": "https://github.com/riversun/facedetector#readme",
+  "dependencies": {
+    "lowpassf": "^0.5.0"
+  },
+  "devDependencies": {
+    "browserify": "^14.5.0",
+    "http-server": "^0.10.0",
+    "lowpassf": "^0.5.0",
+    "npm-run-all": "^4.1.2",
+    "watchify": "^3.9.0"
+  }
+}

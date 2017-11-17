@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>facedetector - detecting/tracking faces</title>
+</head>
+<body>
+<video id="video" autoplay
+       style="position:absolute;left:0px;top:0px;width: 320px; height: 240px; border: 1px solid black;"></video>
+<canvas id="canvas" style="position:absolute;left:0px;top:0px"></canvas>
+<div style="position:absolute;left:20px;top:260px"><a href="https://github.com/riversun/facedetector">facedetector for javascript/node.js</a></div>
+
+<script src="js/FaceDetector.js"></script>
+<script src="js/WebcamManager.js"></script>
+<script>
+
+    var camStreamWidth = 640;
+    var camStreamHeight = 480;
+
+    var VIEW_WIDTH = 320;
+    var VIEW_HEIGHT = 240;
+
+    var video = document.getElementById("video");
+    var canvas = document.getElementById("canvas");
+
+    canvas.width = VIEW_WIDTH;
+    canvas.height = VIEW_HEIGHT;
+
+    var webcamParams = {
+        video: {
+            mandatory: {
+                maxWidth: camStreamWidth,
+                maxHeight: camStreamHeight,
+                minWidth: camStreamWidth,
+                minHeight: camStreamHeight
+            }
+        }
+    };
+    var webcamMgr = new WebCamManager(
+        {
+            webcamParams: webcamParams, //Set params for web camera
+            testVideoMode: false,//true:force use example video for test false:use web camera
+            videoTag: video
+        }
+    );
+
+    var faceDetector = new FaceDetector(
+        {
+            video: webcamMgr.getVideoTag(),
+            flipLeftRight: false,
+            flipUpsideDown: false
+        }
+    );
+
+    webcamMgr.setOnGetUserMediaCallback(function () {
+        faceDetector.startDetecting();
+    });
+
+    faceDetector.setOnFaceAddedCallback(function (addedFaces, detectedFaces) {
+        for (var i = 0; i < addedFaces.length; i++) {
+            console.log("[facedetector] New face detected id=" + addedFaces[i].faceId + " index=" + addedFaces[i].faceIndex);
+        }
+    });
+
+    faceDetector.setOnFaceLostCallback(function (lostFaces, detectedFaces) {
+
+        var ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, VIEW_WIDTH, VIEW_HEIGHT);
+
+        for (var i = 0; i < lostFaces.length; i++) {
+            console.log("[facedetector] Face removed id=" + lostFaces[i].faceId + " index=" + lostFaces[i].faceIndex);
+        }
+
+    });
+
+    faceDetector.setOnFaceUpdatedCallback(function (detectedFaces) {
+
+        var ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, VIEW_WIDTH, VIEW_HEIGHT);
+
+        ctx.strokeStyle = "red";
+        ctx.lineWidth = 3;
+        ctx.fillStyle = "red";
+        ctx.font = "italic small-caps bold 20px arial";
+
+        for (var i = 0; i < detectedFaces.length; i++) {
+
+            var face = detectedFaces[i];
+
+            ctx.fillText(face.faceId, face.x * VIEW_WIDTH, face.y * VIEW_HEIGHT);
+            ctx.strokeRect(face.x * VIEW_WIDTH, face.y * VIEW_HEIGHT + 10, face.width * VIEW_WIDTH, face.height * VIEW_HEIGHT);
+
+        }
+    });
+
+
+    webcamMgr.startCamera();
+
+</script>
+</body>
+</html>
