@@ -68,7 +68,9 @@ var WebCamManager = (function () {
                     function (mediaStream) {
 
                         _this._localMediaStream = mediaStream;
-                        _this._videoTag.src = window.URL.createObjectURL(mediaStream);
+                        //old syntax
+                        //_this._videoTag.src = window.URL.createObjectURL(mediaStream);
+                        _this._videoTag.srcObject = mediaStream;
 
 
                         _this._videoTag.play();
